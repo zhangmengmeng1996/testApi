@@ -7,12 +7,12 @@ import com.wechat.task.EvnTask;
 import com.wechat.utils.FakerUtils;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
 
 /**
  * @program: testAppium
@@ -21,8 +21,8 @@ import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
  * @create: 2020-10-28 15:28
  **/
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class Demo_03 {
-    private static final Logger logger = LoggerFactory.getLogger(Demo_03.class);
+public class Demo_4 {
+    private static final Logger logger = LoggerFactory.getLogger(Demo_4.class);
     public static String access_token;
     public static String departmentId;
     /*
@@ -43,18 +43,13 @@ public class Demo_03 {
         EvnTask.evnClick(access_token);
     }
     /*
-    创建部门
+    创建部门超过32
      */
-
+    @ParameterizedTest
     @Description("通讯录创建部门")
     @Order(1)
-    @RepeatedTest(40)//执行次数
-    @Execution(CONCURRENT)//CONCURRENT表示支持多线程
-    void creatDepartment() {
-        //创建名字时创建时间戳
-        //线程号+时间戳避免了重复
-        String backenStr=Thread.currentThread().getId()+FakerUtils.getTimeStamp();
-        String creatName="createName"+backenStr;
+    @CsvFileSource(resources="/data/createDepartment.csv",numLinesToSkip = 1)
+    void creatDepartment(String creatName,String returnCode) {
         Response response=DepartmentApiObject.creatDepartment(creatName,access_token);
         if(response.path("id")!=null){
             departmentId=response.path("id").toString();
@@ -62,7 +57,7 @@ public class Demo_03 {
         else{
             logger.error("未获取到部门id");
         }
-        assertEquals("0",response.path("errcode").toString());
+        assertEquals(returnCode,response.path("errcode").toString());
     }
 
     @Test
@@ -78,7 +73,7 @@ public class Demo_03 {
         }
         String updateName="updateName"+FakerUtils.getTimeStamp();
         Response updateResponse = DepartmentApiObject.updateDepartment(updateName,departmentId,access_token);
-        }
+    }
 
     @Test
     @Description("通讯录查询部门")
@@ -106,7 +101,7 @@ public class Demo_03 {
             logger.error("未获取到部门id");
         }
         Response deleteResponse = DepartmentApiObject.deleteDepartment(departmentId,access_token);
-       // assertEquals("0", response.path("errcode").toString());
+        // assertEquals("0", response.path("errcode").toString());
     }
 
 }
