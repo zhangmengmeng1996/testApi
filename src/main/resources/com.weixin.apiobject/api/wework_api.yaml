@@ -1,0 +1,11 @@
+#ApiObjectModel
+name: wework
+methods:
+  #ApiObjectMethodModel
+  get_token:
+    method: get
+    url: https://qyapi.weixin.qq.com/cgi-bin/gettoken
+    query:
+      corpid: ww70c27c0a62bde38a
+      corpsecret: VYft5rbVYNG4psycXuuS7fN1jDrH8wP-d5_VsIi6iEg
+    save: access_token
